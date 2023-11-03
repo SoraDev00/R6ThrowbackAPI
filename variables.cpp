@@ -20,6 +20,8 @@ uintptr_t onMatchBaseAddress;
 uintptr_t onMatchFinalAddress;
 uintptr_t onSituationBaseAddress;
 uintptr_t onSituationFinalAddress;
+uintptr_t playerBaseAddress;
+uintptr_t playerFinalAddress;
 bool onMatch;
 
 uintptr_t GetBaseAddress(uintptr_t moduleOffset, const wchar_t* moduleName){
@@ -41,7 +43,7 @@ uintptr_t GetBaseAddress(uintptr_t moduleOffset, const wchar_t* moduleName){
 
 bool OnMatch(){
     char retValue;
-    ReadProcessMemory(hProcess, (BYTE*)onMatchFinalAddress, &retValue, sizeof(char), nullptr);
+    ReadProcessMemory(hProcess, (BYTE*)onMatchFinalAddress, &retValue, sizeof(retValue), nullptr);
     if(retValue == 1)
         return true;
     else
@@ -50,7 +52,7 @@ bool OnMatch(){
 
 bool OnSituation(){
     char retValue;
-    ReadProcessMemory(hProcess, (BYTE*)onSituationFinalAddress, &retValue, sizeof(char), nullptr);
+    ReadProcessMemory(hProcess, (BYTE*)onSituationFinalAddress, &retValue, sizeof(retValue), nullptr);
     if(retValue == 1)
         return true;
     else
@@ -63,12 +65,19 @@ bool OnMainMenu(){
     else
         return false;
 }
+std::string PlayerName(){
+    char retValue[100];
+    ReadProcessMemory(hProcess, (BYTE*)playerFinalAddress, &retValue, sizeof(retValue), nullptr);
+    return retValue;
+}
 
 int GetAllBaseAddress(){
     onMatchBaseAddress = GetBaseAddress(0x05880AA8, L"RainbowSix.exe");
     onMatchFinalAddress = FindDMAAddy(hProcess, onMatchBaseAddress, {0x7F4});
     onSituationBaseAddress = GetBaseAddress(0x061C2900, L"RainbowSix.exe");
     onSituationFinalAddress = FindDMAAddy(hProcess, onSituationBaseAddress, {0xD10});
+    playerBaseAddress = GetBaseAddress(0x0620FEA0, L"RainbowSix.exe");
+    playerFinalAddress = FindDMAAddy(hProcess, playerBaseAddress, {0x8,0x628});
     return 0;
 }
 
