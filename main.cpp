@@ -8,6 +8,8 @@
 bool OnMatch();
 bool OnSituation();
 bool OnMainMenu();
+int PlayerXP();
+int PlayerDeaths();
 std::string PlayerName();
 
 
@@ -34,12 +36,17 @@ int main(int argc, char *argv[])
         bool onMatch = OnMatch();
         bool onSituation = OnSituation();
         bool onMainMenu = OnMainMenu();
+        int playerXP = PlayerXP();
+        int playerDeaths = PlayerDeaths();
         std::string playerName = PlayerName();
 
         qInfo() << "On Match: " + QString::number(onMatch);
         qInfo() << "On Situation: " + QString::number(onSituation);
         qInfo() << "On Main Menu: " + QString::number(onMainMenu);
         qInfo() << "PlayerName: " + playerName;
+        qInfo() << "PlayerXP: " + QString::number(playerXP);
+        qInfo() << "PlayerDeaths: " + QString::number(playerDeaths);
+
 
         QThread::msleep(1);
     }
