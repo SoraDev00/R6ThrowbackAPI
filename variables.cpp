@@ -74,10 +74,10 @@ std::string PlayerName(){
 int GetAllBaseAddress(){
     onMatchBaseAddress = GetBaseAddress(0x05880AA8, L"RainbowSix.exe");
     onMatchFinalAddress = FindDMAAddy(hProcess, onMatchBaseAddress, {0x7F4});
-    onSituationBaseAddress = GetBaseAddress(0x061C2900, L"RainbowSix.exe");
-    onSituationFinalAddress = FindDMAAddy(hProcess, onSituationBaseAddress, {0xD10});
-    playerBaseAddress = GetBaseAddress(0x0620FEA0, L"RainbowSix.exe");
-    playerFinalAddress = FindDMAAddy(hProcess, playerBaseAddress, {0x8,0x628});
+    onSituationBaseAddress = GetBaseAddress(0x045DB0B0, L"RainbowSix.exe");
+    onSituationFinalAddress = FindDMAAddy(hProcess, onSituationBaseAddress, {0xB0, 0xD70});
+    playerBaseAddress = GetBaseAddress(0x043F79C8, L"RainbowSix.exe");
+    playerFinalAddress = FindDMAAddy(hProcess, playerBaseAddress, {0x18,0x120, 0x8, 0x40, 0x0});
     return 0;
 }
 
