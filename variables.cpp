@@ -26,6 +26,10 @@ uintptr_t playerDeathsBaseAddress;
 uintptr_t playerDeathsFinalAddress;
 uintptr_t playerXPBaseAddress;
 uintptr_t playerXPFinalAddress;
+uintptr_t playerKillsBaseAddress;
+uintptr_t playerKillsFinalAddress;
+uintptr_t playerRemainingPlayersBaseAddress;
+uintptr_t playerRemainingPlayersFinalAddress;
 bool onMatch;
 
 uintptr_t GetBaseAddress(uintptr_t moduleOffset, const wchar_t* moduleName){
@@ -87,17 +91,33 @@ int PlayerXP(){
     return retValue;
 }
 
+int PlayerKills(){
+    int retValue;
+    ReadProcessMemory(hProcess, (BYTE*)playerKillsFinalAddress, &retValue, sizeof(retValue), nullptr);
+    return retValue;
+}
+
+int RemainingEnemies(){
+    int retValue;
+    ReadProcessMemory(hProcess, (BYTE*)playerRemainingPlayersFinalAddress, &retValue, sizeof(retValue), nullptr);
+    return retValue;
+}
+
 int GetAllBaseAddress(){
-    onMatchBaseAddress = GetBaseAddress(0x05880AA8, L"RainbowSix.exe");
-    onMatchFinalAddress = FindDMAAddy(hProcess, onMatchBaseAddress, {0x7F4});
-    onSituationBaseAddress = GetBaseAddress(0x045DB0B0, L"RainbowSix.exe");
-    onSituationFinalAddress = FindDMAAddy(hProcess, onSituationBaseAddress, {0xB0, 0xD70});
+    onMatchBaseAddress = GetBaseAddress(0x061B5468, L"RainbowSix.exe");
+    onMatchFinalAddress = FindDMAAddy(hProcess, onMatchBaseAddress, {0x88, 0x8, 0x18, 0x68, 0x854});
+    onSituationBaseAddress = GetBaseAddress(0x061E0720, L"RainbowSix.exe");
+    onSituationFinalAddress = FindDMAAddy(hProcess, onSituationBaseAddress, {0x48, 0x0, 0x60, 0xCE0});
     playerNameBaseAddress = GetBaseAddress(0x043F79C8, L"RainbowSix.exe");
     playerNameFinalAddress = FindDMAAddy(hProcess, playerNameBaseAddress, {0x18,0x120, 0x8, 0x40, 0x0});
-    playerDeathsBaseAddress = GetBaseAddress(0x05880F40, L"RainbowSix.exe");
-    playerDeathsFinalAddress = FindDMAAddy(hProcess, playerDeathsBaseAddress, {0xB8,0x38, 0xB8C});
+    playerDeathsBaseAddress = GetBaseAddress(0x058821E8, L"RainbowSix.exe");
+    playerDeathsFinalAddress = FindDMAAddy(hProcess, playerDeathsBaseAddress, {0x48 ,0x18, 0xD0, 0x8C});
     playerXPBaseAddress = GetBaseAddress(0x058821E8, L"RainbowSix.exe");
-    playerXPFinalAddress = FindDMAAddy(hProcess, playerXPBaseAddress, {0x48,0x18, 0xB84});
+    playerXPFinalAddress = FindDMAAddy(hProcess, playerXPBaseAddress, {0x48 ,0x18, 0xD0, 0x84});
+    playerKillsBaseAddress = GetBaseAddress(0x058821E8, L"RainbowSix.exe");
+    playerKillsFinalAddress = FindDMAAddy(hProcess, playerKillsBaseAddress, {0x48 ,0x18, 0xD0, 0x70});
+    playerRemainingPlayersBaseAddress = GetBaseAddress(0x058828D0, L"RainbowSix.exe");
+    playerRemainingPlayersFinalAddress = FindDMAAddy(hProcess, playerRemainingPlayersBaseAddress, {0x18 ,0x70, 0x18, 0x1B0});
     return 0;
 }
 

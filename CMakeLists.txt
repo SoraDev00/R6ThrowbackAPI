@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core LinguistTools)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core LinguistTools)
-
+find_package(Qt6 REQUIRED COMPONENTS Sql)
 set(TS_FILES R6ThrowbackAPI_en_US.ts)
 
 add_executable(R6ThrowbackAPI
@@ -20,7 +20,7 @@ add_executable(R6ThrowbackAPI
   proc.h proc.cpp
   variables.h variables.cpp
 )
-target_link_libraries(R6ThrowbackAPI Qt${QT_VERSION_MAJOR}::Core)
+target_link_libraries(R6ThrowbackAPI Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Sql)
 
 if(COMMAND qt_create_translation)
     qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
