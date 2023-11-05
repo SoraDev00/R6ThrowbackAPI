@@ -30,6 +30,8 @@ uintptr_t playerKillsBaseAddress;
 uintptr_t playerKillsFinalAddress;
 uintptr_t playerRemainingPlayersBaseAddress;
 uintptr_t playerRemainingPlayersFinalAddress;
+uintptr_t playerWinBaseAddress;
+uintptr_t playerWinFinalAddress;
 bool onMatch;
 
 uintptr_t GetBaseAddress(uintptr_t moduleOffset, const wchar_t* moduleName){
@@ -103,6 +105,12 @@ int RemainingEnemies(){
     return retValue;
 }
 
+int PlayerWin(){
+    int retValue;
+    ReadProcessMemory(hProcess, (BYTE*)playerWinFinalAddress, &retValue, sizeof(retValue), nullptr);
+    return retValue;
+}
+
 int GetAllBaseAddress(){
     onMatchBaseAddress = GetBaseAddress(0x061B5468, L"RainbowSix.exe");
     onMatchFinalAddress = FindDMAAddy(hProcess, onMatchBaseAddress, {0x88, 0x8, 0x18, 0x68, 0x854});
@@ -118,6 +126,8 @@ int GetAllBaseAddress(){
     playerKillsFinalAddress = FindDMAAddy(hProcess, playerKillsBaseAddress, {0x48 ,0x18, 0xD0, 0x70});
     playerRemainingPlayersBaseAddress = GetBaseAddress(0x058828D0, L"RainbowSix.exe");
     playerRemainingPlayersFinalAddress = FindDMAAddy(hProcess, playerRemainingPlayersBaseAddress, {0x18 ,0x70, 0x18, 0x1B0});
+    playerWinBaseAddress = GetBaseAddress(0x061C3100, L"RainbowSix.exe");
+    playerWinFinalAddress = FindDMAAddy(hProcess, playerWinBaseAddress, {0x70});
     return 0;
 }
 

@@ -15,6 +15,7 @@ int PlayerXP();
 int PlayerDeaths();
 int PlayerKills();
 int RemainingEnemies();
+int PlayerWin();
 
 std::string PlayerName();
 
@@ -31,6 +32,7 @@ int deaths = 1;
 int xp = 100;
 int timePlayed = 1;
 int remainingEnemies = 0;
+int playerWin = 0;
 
 
 int main(int argc, char *argv[])
@@ -59,6 +61,7 @@ int main(int argc, char *argv[])
         playerName = PlayerName();
         kills = PlayerKills();
         remainingEnemies = RemainingEnemies();
+        playerWin = PlayerWin();
 
         qInfo() << "On Match: " + QString::number(onMatch);
         qInfo() << "On Situation: " + QString::number(onSituation);
@@ -67,6 +70,7 @@ int main(int argc, char *argv[])
         qInfo() << "PlayerXP: " + QString::number(xp);
         qInfo() << "PlayerDeaths: " + QString::number(deaths);
         qInfo() << "PlayerKills: " + QString::number(kills);
+        qInfo() << "PlayerWin: " + QString::number(playerWin);
         qInfo() << "RemainingEnemies: " + QString::number(remainingEnemies);
 
         QThread::msleep(100);
