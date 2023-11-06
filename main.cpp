@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
         playerWin = PlayerWin();
         isPlaying = IsPlaying();
 
-        if(isPlaying != isPlayingBuffer)
+        if(isPlaying != isPlayingBuffer && onSituation == 0)
         {
             ConnectDatabase();
             isPlayingBuffer = isPlaying;
@@ -94,64 +94,63 @@ int main(int argc, char *argv[])
 void ConnectDatabase() {
     QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
     db.setDatabaseName("DRIVER={SQL SERVER};SERVER=Alessandro\\SQLEXPRESS;DATABASE=Users;Trusted_Connection=Yes;");
-    if(db.open())
-    {
-        int dbKills, dbDeaths, dbAssistances, dbXP = 0;
-        QSqlQuery query;
-        query.prepare("SELECT Kills, Assistances, Deaths, XP  FROM Users WHERE UplayID = :uplayId");
-        query.bindValue(":uplayId", QString::fromStdString(uplayId));
 
-        if (query.exec() && query.next()) {
-            dbKills = query.value(0).toInt();
-            dbDeaths = query.value(1).toInt();
-            dbAssistances = query.value(2).toInt();
-            dbXP = query.value(3).toInt();
+    if (db.open()) {
+        int dbKills = 0, dbDeaths = 0, dbAssistances = 0, dbXP = 0;
 
+        QSqlQuery selectQuery;
+        selectQuery.prepare("SELECT Kills, Assistances, Deaths, XP FROM Users WHERE UplayID = :uplayId");
+        selectQuery.bindValue(":uplayId", QString::fromStdString(uplayId));
+
+        if (selectQuery.exec() && selectQuery.next()) {
+            dbKills = selectQuery.value(0).toInt();
+            dbAssistances = selectQuery.value(1).toInt();
+            dbDeaths = selectQuery.value(2).toInt();
+            dbXP = selectQuery.value(3).toInt();
         } else {
             qWarning() << "No se encontraron filas para UplayID " << uplayId;
         }
 
-        query.prepare("UPDATE Users SET PlayerName = :playerName, UplayID = :uplayId, Kills = :kills, Assistances = :assistances, Deaths = :deaths, XP = :xp, TimePlayed = :timePlayed WHERE UplayID = :uplayId");
-        query.bindValue(":playerName", QString::fromStdString(playerName));
-        query.bindValue(":uplayId", QString::fromStdString(uplayId));
-        query.bindValue(":kills", kills + dbKills);
-        query.bindValue(":assistances", assistances + dbAssistances);
-        query.bindValue(":deaths", deaths + dbDeaths);
-        query.bindValue(":xp", xp + dbXP);
-        query.bindValue(":timePlayed", timePlayed);
-        qInfo() << "Se encontraron resultados.";
+        QSqlQuery updateQuery;
 
-        if (query.exec()) {
-            int numRowsAffected = query.numRowsAffected();
-            if (numRowsAffected > 0) {
+        updateQuery.prepare("UPDATE Users SET PlayerName = :playerName, Kills = :kills, Assistances = :assistances, Deaths = :deaths, XP = :xp, TimePlayed = :timePlayed WHERE UplayID = :uplayId");
+        updateQuery.bindValue(":playerName", QString::fromStdString(playerName));
+        updateQuery.bindValue(":uplayId", QString::fromStdString(uplayId));
+        updateQuery.bindValue(":kills", kills + dbKills);
+        updateQuery.bindValue(":assistances", assistances + dbAssistances);
+        updateQuery.bindValue(":deaths", deaths + dbDeaths);
+        updateQuery.bindValue(":xp", xp + dbXP);
+        updateQuery.bindValue(":timePlayed", timePlayed);
 
-            } else {
-                QSqlQuery query;
-                query.prepare("INSERT INTO Users (PlayerName, UplayID, Kills, Assistances, Deaths, XP, TimePlayed) "
-                              "VALUES (:playerName, :uplayId, :kills, :assistances, :deaths, :xp, :timePlayed)");
-                query.bindValue(":playerName", QString::fromStdString(playerName));
-                query.bindValue(":uplayId", QString::fromStdString(uplayId));
-                query.bindValue(":kills", kills);
-                query.bindValue(":assistances", assistances);
-                query.bindValue(":deaths", deaths);
-                query.bindValue(":xp", xp);
-                query.bindValue(":timePlayed", timePlayed);
-                qInfo() << "Se encontraron resultados.";
+        if (updateQuery.exec()) {
+            int numRowsAffected = updateQuery.numRowsAffected();
 
-                if (query.exec()) {
-                    qInfo() << "Logrado con éxito";
+            if (numRowsAffected == 0) {
+                // Si la actualización no afecta filas, realiza una inserción en su lugar
+                QSqlQuery insertQuery;
+                insertQuery.prepare("INSERT INTO Users (PlayerName, UplayID, Kills, Assistances, Deaths, XP, TimePlayed) "
+                                    "VALUES (:playerName, :uplayId, :kills, :assistances, :deaths, :xp, :timePlayed)");
+                insertQuery.bindValue(":playerName", QString::fromStdString(playerName));
+                insertQuery.bindValue(":uplayId", QString::fromStdString(uplayId));
+                insertQuery.bindValue(":kills", kills);
+                insertQuery.bindValue(":assistances", assistances);
+                insertQuery.bindValue(":deaths", deaths);
+                insertQuery.bindValue(":xp", xp);
+                insertQuery.bindValue(":timePlayed", timePlayed);
+
+                if (insertQuery.exec()) {
+                    qInfo() << "Inserción exitosa";
                 } else {
-                    qWarning() << "Error al actualizar valores en la tabla stats: " << query.lastError().text();
+                    qWarning() << "Error al insertar valores en la tabla Users: " << insertQuery.lastError().text();
                 }
+            } else {
+                qInfo() << "Actualización exitosa, se actualizaron " << numRowsAffected << " fila(s).";
             }
         } else {
-            qWarning() << "Error al actualizar valores en la tabla stats: " << query.lastError().text();
+            qWarning() << "Error al actualizar valores en la tabla Users: " << updateQuery.lastError().text();
         }
-
-    }
-    else
-    {
-        qDebug() << "error : " + db.lastError().text();
+    } else {
+        qWarning() << "Error al abrir la base de datos: " << db.lastError().text();
     }
 }
 
