@@ -1,5 +1,10 @@
 #include "variables.h"
 #include "proc.h"
+#include <ostream>
+#include <QFile>
+#include <QTextStream>
+
+
 
 
 DWORD GetProcID(const wchar_t* procName);
@@ -21,8 +26,6 @@ uintptr_t onMatchBaseAddress;
 uintptr_t onMatchFinalAddress;
 uintptr_t onSituationBaseAddress;
 uintptr_t onSituationFinalAddress;
-uintptr_t playerNameBaseAddress;
-uintptr_t playerNameFinalAddress;
 uintptr_t playerDeathsBaseAddress;
 uintptr_t playerDeathsFinalAddress;
 uintptr_t playerXPBaseAddress;
@@ -79,11 +82,6 @@ bool OnMainMenu(){
     else
         return false;
 }
-std::string PlayerName(){
-    char retValue[100];
-    ReadProcessMemory(hProcess, (BYTE*)playerNameFinalAddress, &retValue, sizeof(retValue), nullptr);
-    return retValue;
-}
 
 int PlayerDeaths(){
     int retValue;
@@ -126,8 +124,6 @@ int GetAllBaseAddress(){
     onMatchFinalAddress = FindDMAAddy(hProcess, onMatchBaseAddress, {0x88, 0x8, 0x18, 0x68, 0x854});
     onSituationBaseAddress = GetBaseAddress(0x061E0720, L"RainbowSix.exe");
     onSituationFinalAddress = FindDMAAddy(hProcess, onSituationBaseAddress, {0x48, 0x0, 0x60, 0xCE0});
-    playerNameBaseAddress = GetBaseAddress(0x043F79C8, L"RainbowSix.exe");
-    playerNameFinalAddress = FindDMAAddy(hProcess, playerNameBaseAddress, {0x18,0x120, 0x8, 0x40, 0x0});
     playerDeathsBaseAddress = GetBaseAddress(0x058821E8, L"RainbowSix.exe");
     playerDeathsFinalAddress = FindDMAAddy(hProcess, playerDeathsBaseAddress, {0x48 ,0x18, 0xD0, 0x8C});
     playerXPBaseAddress = GetBaseAddress(0x058821E8, L"RainbowSix.exe");
@@ -143,6 +139,27 @@ int GetAllBaseAddress(){
 
 
     return 0;
+}
+
+QString GetPath() {
+    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, GetProcID(L"RainbowSix.exe"));
+    if (hProcess) {
+        char filePath[MAX_PATH];
+        DWORD size = sizeof(filePath);
+
+        if (QueryFullProcessImageNameA(hProcess, 0, filePath, &size)) {
+            QString fullPath = QString::fromLocal8Bit(filePath);
+            size_t lastSlash = fullPath.lastIndexOf('\\');
+            if (lastSlash != -1) {
+                QString folderPath = fullPath.left(lastSlash);
+                CloseHandle(hProcess);
+                return folderPath;
+            }
+        }
+        CloseHandle(hProcess);
+    }
+
+    return "Null";
 }
 
 
