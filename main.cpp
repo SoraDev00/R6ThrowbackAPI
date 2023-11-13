@@ -8,22 +8,9 @@
 #include <QTextStream>
 #include <Windows.h>
 #include <iostream>
-
 #include "variables.h"
 
-bool OnMatch();
-bool OnSituation();
-bool OnMainMenu();
-int PlayerXP();
-int PlayerDeaths();
-int PlayerKills();
-int RemainingEnemies();
-int PlayerWin();
-int IsPlaying();
-
 void ConnectDatabase();
-
-int GetAllBaseAddress();
 
 int id = 0;
 QString playerName = "Alessandro";
@@ -38,9 +25,9 @@ int remainingEnemies = 0;
 int playerWin = 0;
 int isPlaying = 0;
 int isPlayingBuffer = 0;
-const char* GetText();
 
 QString GetPath();
+
 void GetUserLocalInfo(QString path);
 
 int main(int argc, char *argv[])
@@ -73,7 +60,7 @@ int main(int argc, char *argv[])
         playerWin = PlayerWin();
         isPlaying = IsPlaying();
 
-        if(isPlaying != isPlayingBuffer && onSituation == 0)
+        if(isPlaying != isPlayingBuffer && onSituation == 0 && xp > 0)
         {
             ConnectDatabase();
             isPlayingBuffer = isPlaying;
@@ -158,6 +145,8 @@ void ConnectDatabase() {
         updateQuery.bindValue(":defeats", lose + dbDefeats);
         updateQuery.bindValue(":mmr", mmr + dbMMR);
         updateQuery.bindValue(":timePlayed", timePlayed + dbTimePlayed);
+
+        qInfo() << "test";
 
         if (updateQuery.exec()) {
             int numRowsAffected = updateQuery.numRowsAffected();

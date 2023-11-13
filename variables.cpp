@@ -6,21 +6,11 @@
 
 
 
-
-DWORD GetProcID(const wchar_t* procName);
-
-uintptr_t GetModuleBaseAddress(DWORD procId, const wchar_t* modName);
-
-uintptr_t FindDMAAddy(HANDLE hProc, uintptr_t ptr, std::vector<unsigned int> offsets);
-
 HANDLE hConsole;
 HANDLE hProcess;
 uintptr_t baseAddress;
 
-uintptr_t GetBaseAddress(uintptr_t moduleOffset);
-bool OnMatch();
-bool OnSituation();
-const char* GetText();
+uintptr_t GetBaseAddress(uintptr_t moduleOffset, const wchar_t* moduleName);
 
 uintptr_t onMatchBaseAddress;
 uintptr_t onMatchFinalAddress;
